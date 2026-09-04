@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillBridge - Cooperative Gig Services Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coop: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        brand: {
+                            dark: '#0f172a',
+                            light: '#f8fafc',
+                            blue: '#2563eb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for AI Demand Forecasting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- TOP GLOBAL NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand / Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchRole('customer')">
+                    <div class="w-10 h-10 rounded-xl bg-coop-600 flex items-center justify-center text-white shadow-md shadow-coop-500/20">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-extrabold text-xl tracking-tight text-slate-900 brand-font">Skill<span class="text-coop-600">Bridge</span></span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Cooperative First</span>
+                        </div>
+                        <p class="text-xs text-slate-500 hidden sm:block">SIH 2026 Problem Statement 26089</p>
+                    </div>
+                </div>
+
+                <!-- ROLE SELECTOR TABS -->
+                <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-sm font-medium">
+                    <button id="tab-customer" onclick="switchRole('customer')" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg transition-all bg-white text-slate-900 shadow-sm font-semibold">
+                        <i data-lucide="user" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Customer</span>
+                    </button>
+                    <button id="tab-worker" onclick="switchRole('worker')" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                        <i data-lucide="hard-hat" class="w-4 h-4 text-amber-600"></i>
+                        <span>Worker</span>
+                        <span id="worker-job-badge" class="hidden ml-1 px-1.5 py-0.2 text-[10px] bg-red-500 text-white rounded-full font-bold">1</span>
+                    </button>
+                    <button id="tab-admin" onclick="switchRole('admin')" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                        <i data-lucide="landmark" class="w-4 h-4 text-blue-600"></i>
+                        <span>Coop Admin</span>
+                    </button>
+                    <button id="tab-tour" onclick="switchRole('tour')" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg transition-all text-purple-700 bg-purple-50 hover:bg-purple-100 font-semibold border border-purple-200 ml-1">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-purple-600 animate-pulse"></i>
+                        <span>SIH Demo Story</span>
+                    </button>
+                </div>
+
+                <!-- USER SWITCHER & UTILITIES -->
+                <div class="flex items-center space-x-3">
+                    <div class="text-right hidden md:block">
+                        <div id="current-user-name" class="text-xs font-bold text-slate-800">Rajesh Mehta</div>
+                        <div id="current-user-role-badge" class="text-[11px] text-coop-600 font-medium">Customer (Indiranagar)</div>
+                    </div>
+                    <button onclick="resetDemoState()" title="Reset demo to initial pristine state" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition" title="Reset Demo Data">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ======================================================== -->
+        <!-- 1. CUSTOMER PORTAL -->
+        <!-- ======================================================== -->
+        <section id="portal-customer" class="space-y-6">
+            <!-- Hero Banner -->
+            <div class="rounded-2xl bg-gradient-to-r from-emerald-800 via-coop-700 to-teal-800 text-white p-6 sm:p-8 shadow-lg relative overflow-hidden">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-900/60 text-emerald-200 border border-emerald-500/30 mb-3">
+                        <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                        <span>100% Certified Cooperative Tradesmen</span>
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Fair & Verified Home Services</h1>
+                    <p class="mt-2 text-emerald-100 text-sm sm:text-base leading-relaxed">
+                        Book directly with certified members of registered worker cooperatives. Guaranteed fair wages, transparent pricing, and 5% allocated to member health & emergency welfare.
+                    </p>
+                </div>
+                <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-8 translate-y-8">
+                    <i data-lucide="shield-check" class="w-72 h-72"></i>
+                </div>
+            </div>
+
+            <!-- SEARCH & CONFIGURATION BAR -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                <!-- Location Selector -->
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-emerald-600"></i>
+                    <div>
+                        <span class="text-xs text-slate-500 font-medium block">Service Location</span>
+                        <select id="cust-location" onchange="onCustomerLocationChange()" class="text-sm font-semibold text-slate-800 bg-transparent focus:outline-none cursor-pointer">
+                            <option value="Indiranagar" selected>Indiranagar 100ft Road (12.9784, 77.6408)</option>
+                            <option value="Koramangala">Koramangala 4th Block (12.9340, 77.6200)</option>
+                            <option value="Jayanagar">Jayanagar 4th T Block (12.9250, 77.5938)</option>
+                            <option value="HSR Layout">HSR Layout Sector 2 (12.9121, 77.6446)</option>
+                            <option value="Whitefield">Whitefield Main Road (12.9698, 77.7500)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Emergency Rapid Booking Switch (FR-11) -->
+                <div class="flex items-center space-x-3 bg-red-50 border border-red-200 px-4 py-2 rounded-xl">
+                    <div class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="cust-emergency" onchange="loadCustomerServices()" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-xs font-bold text-red-700 uppercase tracking-wide">🚨 Emergency Service</span>
+                            <span class="text-[10px] px-1.5 py-0.5 bg-red-600 text-white rounded font-bold">45 MIN</span>
+                        </div>
+                        <span class="text-[11px] text-red-600 block">Fast-track nearby available emergency responders</span>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex items-center space-x-1 overflow-x-auto pb-1" id="cust-category-filters">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- ACTIVE BOOKING BANNER (If Any) -->
+            <div id="cust-active-booking-container" class="hidden">
+                <!-- Populated dynamically via renderActiveCustomerBooking() -->
+            </div>
+
+            <!-- SERVICES CATALOG GRID -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-slate-900">Cooperative Service Catalog</h2>
+                    <span class="text-xs text-slate-500" id="service-count-label">Loading services...</span>
+                </div>
+                <div id="cust-services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- Dynamic service cards -->
+                </div>
+            </div>
+
+            <!-- RECENT BOOKINGS & INVOICES -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                    <i data-lucide="history" class="w-5 h-5 text-slate-500"></i>
+                    <span>Your Booking & Invoice History</span>
+                </h3>
+                <div id="cust-booking-history" class="divide-y divide-slate-100">
+                    <!-- History rows -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- 2. WORKER PORTAL -->
+        <!-- ======================================================== -->
+        <section id="portal-worker" class="space-y-6 hidden">
+            <!-- Worker Header Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-emerald-800 font-bold text-2xl">
+                            RS
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h2 class="text-xl font-bold text-slate-900" id="worker-card-name">Ramesh Sharma</h2>
+                                <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                                    <span id="worker-card-verif">Verified Cooperative Member</span>
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1" id="worker-card-coop">Bangalore Shramik Seva Cooperative Society • Reg: COOP/BLR/2021/8942</p>
+                            <div class="flex items-center space-x-4 mt-2 text-xs text-slate-500">
+                                <span class="flex items-center text-amber-600 font-bold"><i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 mr-1"></i> <span id="worker-card-rating">4.92</span> (128 reviews)</span>
+                                <span>•</span>
+                                <span id="worker-card-exp">8 Years Experience</span>
+                                <span>•</span>
+                                <span id="worker-card-jobs">214 Jobs Completed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Availability Toggle -->
+                    <div class="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div>
+                            <span class="text-xs text-slate-500 font-medium block">Duty Status</span>
+                            <span id="worker-avail-text" class="text-xs font-bold text-emerald-700">Available for Dispatch</span>
+                        </div>
+                        <select id="worker-avail-select" onchange="toggleWorkerAvailability()" class="text-xs font-semibold px-2 py-1 rounded-lg border border-slate-300 bg-white">
+                            <option value="available" selected>🟢 Available</option>
+                            <option value="busy">🟡 On Job / Busy</option>
+                            <option value="offline">⚪ Offline</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INCOMING JOB ALERT (Flashing if assigned) -->
+            <div id="worker-incoming-alert" class="hidden">
+                <!-- Dynamically injected job acceptance card -->
+            </div>
+
+            <!-- ACTIVE JOB PROGRESSION CONTROLLER -->
+            <div id="worker-active-job-container" class="hidden">
+                <!-- Dynamically injected active job control panel -->
+            </div>
+
+            <!-- WORKER TABS: Earnings | Welfare & Insurance | Governance -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="flex border-b border-slate-200 text-sm font-semibold">
+                    <button id="worker-subtab-earnings" onclick="switchWorkerSubtab('earnings')" class="px-5 py-3 border-b-2 border-coop-600 text-coop-700 bg-emerald-50/50 flex items-center space-x-2">
+                        <i data-lucide="wallet" class="w-4 h-4"></i>
+                        <span>Earnings & Cooperative Payouts</span>
+                    </button>
+                    <button id="worker-subtab-welfare" onclick="switchWorkerSubtab('welfare')" class="px-5 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2">
+                        <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+                        <span>Welfare & Health Shield</span>
+                    </button>
+                    <button id="worker-subtab-governance" onclick="switchWorkerSubtab('governance')" class="px-5 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2">
+                        <i data-lucide="vote" class="w-4 h-4"></i>
+                        <span>Democratic Voting</span>
+                    </button>
+                </div>
+
+                <!-- SUBTAB 1: EARNINGS -->
+                <div id="worker-panel-earnings" class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <span class="text-xs text-slate-500 font-medium">Weekly Earnings</span>
+                            <div class="text-2xl font-black text-slate-900 mt-1" id="worker-stat-weekly-earn">₹2,800.00</div>
+                            <span class="text-[11px] text-emerald-600 font-medium">4 jobs this week</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <span class="text-xs text-slate-500 font-medium">Total Lifetime Earnings</span>
+                            <div class="text-2xl font-black text-slate-900 mt-1" id="worker-stat-total-earn">₹142,000.00</div>
+                            <span class="text-[11px] text-slate-500 font-medium">214 lifetime gigs</span>
+                        </div>
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                            <span class="text-xs text-emerald-800 font-semibold">Welfare Fund Contribution</span>
+                            <div class="text-2xl font-black text-emerald-900 mt-1" id="worker-stat-welfare-contrib">₹7,100.00</div>
+                            <span class="text-[11px] text-emerald-700 font-medium">5% auto-retained for health fund</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <span class="text-xs text-slate-500 font-medium">FairMatch Opportunity Status</span>
+                            <div class="text-sm font-bold text-emerald-700 mt-2 flex items-center space-x-1">
+                                <i data-lucide="trending-up" class="w-4 h-4"></i>
+                                <span>High Fairness Priority</span>
+                            </div>
+                            <span class="text-[11px] text-slate-500 block mt-1">Balanced weekly workload</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-900 mb-3">Recent Payout Settlements</h4>
+                        <div id="worker-payouts-list" class="divide-y divide-slate-100">
+                            <!-- Transactions -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 2: WELFARE & INSURANCE (PRD Section 7 & FR-19) -->
+                <div id="worker-panel-welfare" class="p-6 space-y-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-base font-bold text-slate-900">Cooperative Member Welfare Coverage</h4>
+                            <p class="text-xs text-slate-500">Funded transparently from 5% of gig platform collections, owned democratically by the workers.</p>
+                        </div>
+                        <button onclick="openWelfareClaimModal()" class="px-4 py-2 bg-coop-600 text-white rounded-lg text-xs font-bold hover:bg-coop-700 transition flex items-center space-x-1.5 shadow-sm">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            <span>Submit Welfare Claim</span>
+                        </button>
+                    </div>
+
+                    <div id="worker-welfare-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Welfare Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- SUBTAB 3: DEMOCRATIC GOVERNANCE & PROPOSALS (PRD Section 7 & FR-20) -->
+                <div id="worker-panel-governance" class="p-6 space-y-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-base font-bold text-slate-900">Democratic Cooperative Governance</h4>
+                            <p class="text-xs text-slate-500">One Member, One Vote. Vote on commission allocations, fairness caps, and welfare policies.</p>
+                        </div>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-bold rounded-full">Active Voting Session</span>
+                    </div>
+
+                    <div id="worker-proposals-list" class="space-y-4">
+                        <!-- Proposals injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- 3. COOPERATIVE ADMIN PORTAL -->
+        <!-- ======================================================== -->
+        <section id="portal-admin" class="space-y-6 hidden">
+            <!-- Admin Top Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs text-slate-500 font-medium">Total Bookings</span>
+                    <div class="text-2xl font-black text-slate-900 mt-1" id="admin-stat-bookings">-</div>
+                    <span class="text-[11px] text-emerald-600 font-semibold" id="admin-stat-active-jobs">- Active</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs text-slate-500 font-medium">Platform GMV</span>
+                    <div class="text-2xl font-black text-slate-900 mt-1" id="admin-stat-gmv">-</div>
+                    <span class="text-[11px] text-slate-500">Gross transaction volume</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm bg-emerald-50/40">
+                    <span class="text-xs text-emerald-800 font-semibold">Coop Welfare Reserve</span>
+                    <div class="text-2xl font-black text-emerald-900 mt-1" id="admin-stat-welfare">-</div>
+                    <span class="text-[11px] text-emerald-700 font-medium">Pooled member relief fund</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs text-slate-500 font-medium">Verified Workers</span>
+                    <div class="text-2xl font-black text-slate-900 mt-1" id="admin-stat-workers">-</div>
+                    <span class="text-[11px] text-amber-600 font-semibold" id="admin-stat-pending-workers">- Pending Approval</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-red-200 shadow-sm bg-red-50/30">
+                    <span class="text-xs text-red-700 font-semibold">Emergency Gigs</span>
+                    <div class="text-2xl font-black text-red-900 mt-1" id="admin-stat-emergencies">-</div>
+                    <span class="text-[11px] text-red-600 font-medium">Rapid 45-min dispatches</span>
+                </div>
+            </div>
+
+            <!-- Admin Navigation Subtabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="flex border-b border-slate-200 text-sm font-semibold overflow-x-auto">
+                    <button id="admin-subtab-ai" onclick="switchAdminSubtab('ai')" class="px-5 py-3 border-b-2 border-coop-600 text-coop-700 bg-emerald-50/50 flex items-center space-x-2 whitespace-nowrap">
+                        <i data-lucide="brain-circuit" class="w-4 h-4 text-purple-600"></i>
+                        <span>AI Demand Forecast & Workforce Planning</span>
+                    </button>
+                    <button id="admin-subtab-workers" onclick="switchAdminSubtab('workers')" class="px-5 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 whitespace-nowrap">
+                        <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Worker Verification Queue</span>
+                        <span id="admin-badge-pending-workers" class="px-1.5 py-0.5 text-[10px] bg-amber-500 text-white rounded-full font-bold">2</span>
+                    </button>
+                    <button id="admin-subtab-fairmatch" onclick="switchAdminSubtab('fairmatch')" class="px-5 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 whitespace-nowrap">
+                        <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
+                        <span>FairMatch Weight Tuner</span>
+                    </button>
+                    <button id="admin-subtab-governance" onclick="switchAdminSubtab('governance')" class="px-5 py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 whitespace-nowrap">
+                        <i data-lucide="landmark" class="w-4 h-4 text-slate-600"></i>
+                        <span>Governance Resolutions</span>
+                    </button>
+                </div>
+
+                <!-- SUBTAB 1: AI DEMAND FORECASTING & WORKFORCE PLANNING (PRD Section 11) -->
+                <div id="admin-panel-ai" class="p-6 space-y-6">
+                    <!-- Controls & Selector -->
+                    <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex items-center space-x-4">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block">Service Trade</label>
+                                <select id="ai-filter-service" onchange="loadAIDemandForecast()" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 bg-white">
+                                    <option value="1">Emergency Pipe Leak Repair (Plumbing)</option>
+                                    <option value="3">Emergency Electrical Short Circuit</option>
+                                    <option value="5">AC Cleaning & Gas Servicing</option>
+                                    <option value="7">Full House Deep Cleaning</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block">City Zone</label>
+                                <select id="ai-filter-zone" onchange="loadAIDemandForecast()" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 bg-white">
+                                    <option value="Indiranagar" selected>Indiranagar (East)</option>
+                                    <option value="Koramangala">Koramangala (South-East)</option>
+                                    <option value="Jayanagar">Jayanagar (South)</option>
+                                    <option value="HSR Layout">HSR Layout (South)</option>
+                                    <option value="Whitefield">Whitefield (Tech Hub)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 text-xs">
+                            <span class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-md bg-purple-100 text-purple-800 font-bold">
+                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                                <span id="ai-model-type">RandomForestRegressor</span>
+                            </span>
+                            <span class="text-slate-500 font-medium">Model R²: <b class="text-slate-800" id="ai-model-r2">0.78</b> | MAE: <b class="text-slate-800" id="ai-model-mae">1.99</b></span>
+                            <button onclick="retrainAIModel()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-bold transition flex items-center space-x-1">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                <span>Retrain Model</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Visualizations Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Chart: 24-Hour Hourly Demand Forecast -->
+                        <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                                    <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
+                                    <span>24-Hour Hourly Forecast vs Capacity</span>
+                                </h4>
+                                <span class="text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold" id="ai-peak-hour-badge">Peak: 17:00</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="demandForecastChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- 7-Day Outlook -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col">
+                            <h4 class="text-sm font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                                <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
+                                <span>7-Day Demand Outlook</span>
+                            </h4>
+                            <div id="ai-weekly-outlook" class="flex-1 space-y-2">
+                                <!-- Days injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WORKFORCE PLANNING & DEFICIT GAP ALERTS (PRD Section 11.2) -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600"></i>
+                                    <span>Workforce Capacity & Deficit Gap Engine</span>
+                                </h4>
+                                <p class="text-xs text-slate-500">Proactively identifies zone shortages and prescribes cooperative dispatch actions.</p>
+                            </div>
+                            <span class="text-xs font-bold text-red-600" id="ai-alerts-summary">2 High Priority Shortages</span>
+                        </div>
+                        <div id="ai-workforce-alerts-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Alert cards injected via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 2: WORKER VERIFICATION QUEUE (PRD FR-04) -->
+                <div id="admin-panel-workers" class="p-6 space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-base font-bold text-slate-900">Cooperative Member Verification Queue</h4>
+                            <p class="text-xs text-slate-500">Admins audit applicant trade certifications, government ITI licenses, and cooperative union standing.</p>
+                        </div>
+                        <div class="flex space-x-2 text-xs">
+                            <button onclick="filterAdminWorkers('pending')" class="px-3 py-1 bg-amber-100 text-amber-800 rounded-lg font-bold">Pending Review</button>
+                            <button onclick="filterAdminWorkers('verified')" class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg font-bold">Verified</button>
+                            <button onclick="filterAdminWorkers('all')" class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg font-bold">All Members</button>
+                        </div>
+                    </div>
+                    <div id="admin-worker-queue-list" class="divide-y divide-slate-200">
+                        <!-- Worker review rows injected via JS -->
+                    </div>
+                </div>
+
+                <!-- SUBTAB 3: FAIRMATCH WEIGHT TUNER (PRD Section 10) -->
+                <div id="admin-panel-fairmatch" class="p-6 space-y-6 hidden">
+                    <div class="max-w-2xl">
+                        <h4 class="text-base font-bold text-slate-900">FairMatch Configurable Algorithmic Weights</h4>
+                        <p class="text-xs text-slate-500">
+                            Transparent matching weights per PRD §10. Cooperative governance allows community adjustment of fairness, distance, and workload balancing parameters.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>Skill & Certification Weight (w_skill)</span>
+                                <span id="val-weight-skill" class="text-coop-700">35%</span>
+                            </div>
+                            <input type="range" id="slider-weight-skill" min="5" max="60" value="35" oninput="updateWeightDisplay()" class="w-full">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>Immediate Availability Weight (w_avail)</span>
+                                <span id="val-weight-avail" class="text-coop-700">20%</span>
+                            </div>
+                            <input type="range" id="slider-weight-avail" min="5" max="50" value="20" oninput="updateWeightDisplay()" class="w-full">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>Proximity / Distance Weight (w_dist)</span>
+                                <span id="val-weight-dist" class="text-coop-700">15%</span>
+                            </div>
+                            <input type="range" id="slider-weight-dist" min="5" max="50" value="15" oninput="updateWeightDisplay()" class="w-full">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>Historical Customer Rating (w_rating)</span>
+                                <span id="val-weight-rating" class="text-coop-700">10%</span>
+                            </div>
+                            <input type="range" id="slider-weight-rating" min="5" max="40" value="10" oninput="updateWeightDisplay()" class="w-full">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>Workload Balance Factor (w_workload)</span>
+                                <span id="val-weight-workload" class="text-coop-700">10%</span>
+                            </div>
+                            <input type="range" id="slider-weight-workload" min="0" max="30" value="10" oninput="updateWeightDisplay()" class="w-full">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>Cooperative Fairness Equity Boost (w_fairness)</span>
+                                <span id="val-weight-fairness" class="text-coop-700">10%</span>
+                            </div>
+                            <input type="range" id="slider-weight-fairness" min="0" max="30" value="10" oninput="updateWeightDisplay()" class="w-full">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>Maximum Dispatch Radius (km)</span>
+                                <span id="val-max-radius" class="text-coop-700">15.0 km</span>
+                            </div>
+                            <input type="range" id="slider-max-radius" min="5" max="30" value="15" oninput="updateWeightDisplay()" class="w-full">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button onclick="saveFairMatchWeights()" class="px-5 py-2 bg-coop-600 text-white rounded-lg text-xs font-bold hover:bg-coop-700 transition shadow-sm">
+                            Save Configurable Weights
+                        </button>
+                        <button onclick="resetFairMatchWeightsToDefault()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-300 transition">
+                            Reset to PRD Defaults (35/20/15/10/10/10)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 4: GOVERNANCE RESOLUTIONS (PRD FR-20) -->
+                <div id="admin-panel-governance" class="p-6 space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-base font-bold text-slate-900">Cooperative Resolutions & Voting Windows</h4>
+                            <p class="text-xs text-slate-500">Introduce democratic proposals for member assemblies and ballots.</p>
+                        </div>
+                        <button onclick="openNewProposalModal()" class="px-4 py-2 bg-coop-600 text-white rounded-lg text-xs font-bold hover:bg-coop-700 transition flex items-center space-x-1.5 shadow-sm">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Create New Proposal</span>
+                        </button>
+                    </div>
+
+                    <div id="admin-proposals-list" class="space-y-4">
+                        <!-- Proposals with detailed vote metrics -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================================================== -->
+        <!-- 4. SIH 2026 GUIDED DEMO STORY (PRD Section 21) -->
+        <!-- ======================================================== -->
+        <section id="portal-tour" class="space-y-6 hidden">
+            <div class="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
+                <div class="max-w-3xl relative z-10">
+                    <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/30 text-purple-200 border border-purple-400/30 mb-3">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-purple-300"></i>
+                        <span>PRD Section 21 • SIH 2026 Official Presentation Story</span>
+                    </span>
+                    <h2 class="text-3xl font-extrabold tracking-tight">One Integrated Cooperative Ecosystem</h2>
+                    <p class="mt-2 text-purple-200 text-sm leading-relaxed">
+                        Follow the realistic end-to-end journey: Customer emergency plumbing request &rarr; FairMatch explainable scoring &rarr; Worker acceptance &rarr; Live trip progression &rarr; Digital payment simulation &rarr; Tax invoice & rating &rarr; Cooperative revenue, AI demand forecasting & democratic voting.
+                    </p>
+                    <div class="mt-4 flex items-center space-x-4">
+                        <button onclick="runAutoDemoStory()" class="px-5 py-2.5 bg-coop-500 hover:bg-coop-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-coop-500/30 flex items-center space-x-2 transition">
+                            <i data-lucide="play" class="w-4 h-4"></i>
+                            <span>Auto-Run Complete Story</span>
+                        </button>
+                        <button onclick="resetDemoState()" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-semibold transition border border-white/20">
+                            Reset Clean State
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Step Flow Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="demo-milestones-grid">
+                <!-- Milestones injected via JS -->
+            </div>
+
+            <!-- Demo Console / Live Log -->
+            <div class="bg-slate-900 text-slate-200 rounded-xl p-5 font-mono text-xs shadow-inner">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                    <span class="text-emerald-400 font-bold flex items-center space-x-2">
+                        <i data-lucide="terminal" class="w-4 h-4"></i>
+                        <span>SIH Demo Live Event Stream</span>
+                    </span>
+                    <span class="text-slate-500 text-[10px]" id="demo-log-clock">Live</span>
+                </div>
+                <div id="demo-live-log" class="space-y-1.5 max-h-48 overflow-y-auto">
+                    <div class="text-slate-400">&gt; System initialized. Ready to trigger emergency plumbing scenario.</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                <span class="font-bold text-slate-700">SkillBridge</span> — Cooperative Gig Services Platform for Household & Community Services
+            </div>
+            <div>
+                Smart India Hackathon 2026 • Problem Statement 26089
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======================================================== -->
+    <!-- MODALS -->
+    <!-- ======================================================== -->
+
+    <!-- 1. PAYMENT SIMULATION MODAL -->
+    <div id="modal-payment" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                        <i data-lucide="credit-card" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="font-bold text-base text-slate-900">Cooperative Digital Payment</h3>
+                </div>
+                <button onclick="closeModal('modal-payment')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-500">Service Fee:</span>
+                    <span class="font-bold text-slate-800" id="modal-pay-amount">₹624.00</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-500 mt-1">
+                    <span>Direct to Worker (90%):</span>
+                    <span id="modal-pay-worker">₹561.60</span>
+                </div>
+                <div class="flex justify-between text-xs text-emerald-600 mt-0.5 font-medium">
+                    <span>Coop Welfare Reserve (5%):</span>
+                    <span id="modal-pay-welfare">₹31.20</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-500 mt-0.5">
+                    <span>Platform Ops & Tax (5%):</span>
+                    <span id="modal-pay-fee">₹31.20</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-xs font-semibold text-slate-700 block mb-1">Select Payment Method</label>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <button type="button" class="border-2 border-emerald-600 bg-emerald-50 text-emerald-800 font-bold p-2.5 rounded-lg text-center">
+                        UPI / QR Code
+                    </button>
+                    <button type="button" class="border border-slate-200 text-slate-700 font-medium p-2.5 rounded-lg text-center">
+                        Debit/Credit
+                    </button>
+                    <button type="button" class="border border-slate-200 text-slate-700 font-medium p-2.5 rounded-lg text-center">
+                        Coop Cash
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center py-2">
+                <div class="inline-block p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <!-- Demo UPI QR placeholder -->
+                    <div class="w-32 h-32 bg-slate-900 flex items-center justify-center text-white text-[10px] text-center p-2 rounded">
+                        <span>UPI SCAN & PAY<br><b class="text-emerald-400">skillbridge@coop</b></span>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">Instant simulated digital settlement</p>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="executeSimulatedPayment('success')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                    Simulate Successful Payment
+                </button>
+                <button onclick="executeSimulatedPayment('failed')" class="py-2.5 px-4 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl text-xs font-bold transition">
+                    Simulate Failure
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. COOPERATIVE TAX INVOICE MODAL (PRD FR-13) -->
+    <div id="modal-invoice" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-8 shadow-2xl space-y-6 border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-start justify-between border-b pb-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-extrabold text-xl brand-font text-slate-900">Skill<span class="text-coop-600">Bridge</span></span>
+                        <span class="text-[10px] uppercase font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Tax Invoice</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1" id="inv-coop-name">Bangalore Shramik Seva Cooperative Society</p>
+                    <p class="text-[11px] text-slate-400" id="inv-coop-reg">Registration No: COOP/BLR/2021/8942</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-mono font-bold text-slate-800 block" id="inv-number">SB-INV-2026-00001</span>
+                    <span class="text-[11px] text-slate-400" id="inv-date">2026-09-04</span>
+                </div>
+            </div>
+
+            <!-- Customer & Worker Info -->
+            <div class="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-xl">
+                <div>
+                    <span class="text-slate-400 font-medium block">Billed To:</span>
+                    <span class="font-bold text-slate-800 block" id="inv-cust-name">Rajesh Mehta</span>
+                    <span class="text-slate-600" id="inv-cust-addr">Indiranagar 100ft Rd, Bangalore</span>
+                    <span class="text-slate-500 block" id="inv-cust-phone">+91 9845012345</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 font-medium block">Service Technician:</span>
+                    <span class="font-bold text-slate-800 block" id="inv-worker-name">Ramesh Sharma</span>
+                    <span class="text-slate-600" id="inv-worker-rating">Master Plumber (4.92★)</span>
+                    <span class="text-emerald-700 font-semibold block">Verified Member #WK-01</span>
+                </div>
+            </div>
+
+            <!-- Itemized Table -->
+            <div>
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="border-b text-slate-400 text-left">
+                            <th class="pb-2">Description</th>
+                            <th class="pb-2 text-center">Duration</th>
+                            <th class="pb-2 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr>
+                            <td class="py-2.5 font-medium text-slate-800" id="inv-item-name">Emergency Pipe Leak Repair</td>
+                            <td class="py-2.5 text-center text-slate-500">45 Mins</td>
+                            <td class="py-2.5 text-right font-semibold" id="inv-item-base">₹499.00</td>
+                        </tr>
+                        <tr id="inv-emergency-row">
+                            <td class="py-2 text-red-600 font-medium">Emergency Fast-Track Surcharge (1.25x)</td>
+                            <td class="py-2 text-center text-red-500">Priority</td>
+                            <td class="py-2 text-right text-red-600 font-semibold" id="inv-item-emergency">₹125.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Breakdown of cooperative share -->
+            <div class="border-t pt-3 space-y-1 text-xs">
+                <div class="flex justify-between text-slate-600">
+                    <span>Direct Worker Earnings:</span>
+                    <span class="font-medium" id="inv-worker-share">₹561.60</span>
+                </div>
+                <div class="flex justify-between text-emerald-700 font-medium">
+                    <span>Cooperative Member Welfare Fund Contribution:</span>
+                    <span id="inv-welfare-share">₹31.20</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>GST (5%) & Platform Administration:</span>
+                    <span id="inv-tax-share">₹31.20</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t">
+                    <span>Grand Total Paid:</span>
+                    <span class="text-coop-700" id="inv-grand-total">₹624.00</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-500 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                    <span>Paid via <b id="inv-pay-method">UPI</b> • Ref: <span class="font-mono" id="inv-txn-ref">TXN_98124</span></span>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 bg-emerald-600 text-white rounded font-bold">DIGITALLY VERIFIED</span>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="window.print()" class="flex-1 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 transition flex items-center justify-center space-x-2">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>Print Invoice</span>
+                </button>
+                <button onclick="closeModal('modal-invoice')" class="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-200 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. RATING & FEEDBACK MODAL (PRD FR-14) -->
+    <div id="modal-rating" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-slate-900">Rate Cooperative Service</h3>
+                <button onclick="closeModal('modal-rating')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="text-center py-2">
+                <p class="text-xs text-slate-500 mb-2">How was your service with <b id="rate-worker-name">Ramesh Sharma</b>?</p>
+                <div class="flex items-center justify-center space-x-2" id="star-picker">
+                    <button type="button" onclick="setStarRating(1)" class="star-btn text-amber-400 p-1"><i data-lucide="star" class="w-7 h-7 fill-amber-400"></i></button>
+                    <button type="button" onclick="setStarRating(2)" class="star-btn text-amber-400 p-1"><i data-lucide="star" class="w-7 h-7 fill-amber-400"></i></button>
+                    <button type="button" onclick="setStarRating(3)" class="star-btn text-amber-400 p-1"><i data-lucide="star" class="w-7 h-7 fill-amber-400"></i></button>
+                    <button type="button" onclick="setStarRating(4)" class="star-btn text-amber-400 p-1"><i data-lucide="star" class="w-7 h-7 fill-amber-400"></i></button>
+                    <button type="button" onclick="setStarRating(5)" class="star-btn text-amber-400 p-1"><i data-lucide="star" class="w-7 h-7 fill-amber-400"></i></button>
+                </div>
+                <span class="text-xs font-bold text-emerald-700 block mt-1" id="star-rating-label">5.0 / 5.0 - Excellent</span>
+            </div>
+
+            <div>
+                <label class="text-xs font-semibold text-slate-700 block mb-1">Feedback & Praise</label>
+                <textarea id="rate-feedback-text" rows="3" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Extremely fast response, honest pricing, excellent pipe repair!"></textarea>
+            </div>
+
+            <button onclick="submitCustomerRating()" class="w-full py-2.5 bg-coop-600 text-white rounded-xl text-xs font-bold hover:bg-coop-700 transition shadow-sm">
+                Submit Verified Review
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. WELFARE CLAIM MODAL -->
+    <div id="modal-welfare" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-slate-900">Submit Welfare Fund Claim</h3>
+                <button onclick="closeModal('modal-welfare')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-semibold text-slate-700 block mb-1">Benefit Type</label>
+                    <select id="welfare-claim-type" class="w-full p-2.5 rounded-lg border border-slate-200 bg-white font-medium">
+                        <option value="1">Ayushman Bharat + Cooperative Top-up Shield (Health)</option>
+                        <option value="2">Accidental Injury & Transit Disability Fund</option>
+                        <option value="3">Children Higher Education Scholarship</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-semibold text-slate-700 block mb-1">Claim Amount Requested (₹)</label>
+                    <input type="number" id="welfare-claim-amount" value="5000" class="w-full p-2.5 rounded-lg border border-slate-200">
+                </div>
+                <div>
+                    <label class="font-semibold text-slate-700 block mb-1">Reason & Supporting Details</label>
+                    <textarea id="welfare-claim-reason" rows="3" class="w-full p-2.5 rounded-lg border border-slate-200" placeholder="Describe medical receipt or tool replacement context..."></textarea>
+                </div>
+            </div>
+            <button onclick="submitWelfareClaim()" class="w-full py-2.5 bg-coop-600 text-white rounded-xl text-xs font-bold hover:bg-coop-700 transition">
+                Submit to Welfare Committee
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. NEW PROPOSAL MODAL -->
+    <div id="modal-proposal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-slate-900">Create Cooperative Proposal</h3>
+                <button onclick="closeModal('modal-proposal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-semibold text-slate-700 block mb-1">Proposal Title</label>
+                    <input type="text" id="prop-title" placeholder="e.g. Subsidized Tool Kit Loan Program" class="w-full p-2.5 rounded-lg border border-slate-200 font-medium">
+                </div>
+                <div>
+                    <label class="font-semibold text-slate-700 block mb-1">Category</label>
+                    <select id="prop-category" class="w-full p-2.5 rounded-lg border border-slate-200 bg-white">
+                        <option value="Welfare & Benefits">Welfare & Benefits</option>
+                        <option value="FairMatch Policy">FairMatch Policy & Workload Caps</option>
+                        <option value="Equipment & Logistics">Equipment & Logistics</option>
+                        <option value="Training & Up-skilling">Training & Up-skilling</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-semibold text-slate-700 block mb-1">Resolution Text</label>
+                    <textarea id="prop-desc" rows="3" class="w-full p-2.5 rounded-lg border border-slate-200" placeholder="Detail the resolution for member vote..."></textarea>
+                </div>
+            </div>
+            <button onclick="submitNewProposal()" class="w-full py-2.5 bg-coop-600 text-white rounded-xl text-xs font-bold hover:bg-coop-700 transition">
+                Publish Proposal for Member Ballot
+            </button>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
