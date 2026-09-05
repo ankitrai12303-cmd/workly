@@ -1,7 +1,7 @@
-# SkillBridge: Cooperative Gig Services Platform
+# Workly: Cooperative Gig Services Platform
 **Smart India Hackathon 2026 — Problem Statement 26089**
 
-SkillBridge is a worker-centric digital marketplace connecting customers with verified cooperative service providers through fair matching, intelligent workforce planning, welfare support, and democratic cooperative governance.
+Worklry is a worker-centric digital marketplace connecting customers with verified cooperative service providers through fair matching, intelligent workforce planning, welfare support, and democratic cooperative governance.
 
 ---
 
