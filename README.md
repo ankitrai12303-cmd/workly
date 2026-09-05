@@ -5,7 +5,7 @@ Worklry is a worker-centric digital marketplace connecting customers with verifi
 
 ---
 
-## 🌟 Core Differentiators (Why SkillBridge is NOT an Urban Company clone)
+## 🌟 Core Differentiators (Why Workly is NOT an Urban Company clone)
 1. **Cooperative Ownership**: Workers are verified members of registered labour cooperatives, retaining 90% direct earnings while 5% is pooled into a member health & emergency welfare fund.
 2. **FairMatch Engine (PRD §10)**: Multi-factor explainable worker allocation combining Skill (35%), Availability (20%), Distance (15%), Rating (10%), Workload (10%), and an **Opportunity Fairness Boost (10%)** to prevent gig monopolies and worker burnout.
 3. **AI Demand Forecasting & Workforce Planning (PRD §11)**: Scikit-learn Random Forest model predicting 24-hour hourly and 7-day demand by service trade and zone, generating proactive capacity gap alerts and dispatch recommendations.
